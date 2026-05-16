@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Cheatsheet — The Ultimate Reference</title>
+    <meta name="description" content="A beautiful, comprehensive Git cheatsheet with search, copy-to-clipboard, and dark mode.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Consolas', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+        .code-block::-webkit-scrollbar { height: 4px; }
+        .code-block::-webkit-scrollbar-thumb { background: #52525b; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans antialiased transition-colors duration-200"
+      x-data="cheatsheet()" x-init="init()">
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-50 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl">
+        <div class="mx-auto max-w-6xl px-4 sm:px-6">
+            <div class="flex items-center justify-between h-16">
+                <a href="#" class="flex items-center gap-3 group">
+                    <div class="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white text-lg shadow-lg shadow-orange-500/20 group-hover:shadow-orange-500/40 transition-shadow">
+                        📋
+                    </div>
+                    <span class="text-xl font-bold tracking-tight hidden sm:block">Git<span class="text-orange-500">Cheatsheet</span></span>
+                </a>
+                <div class="flex items-center gap-2">
+                    <a href="#donate" class="flex items-center gap-1.5 rounded-lg border border-orange-200 dark:border-orange-900/50 bg-orange-50 dark:bg-orange-950/50 px-3 py-2 text-sm font-semibold text-orange-600 dark:text-orange-400 hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-all">
+                        <span>☕</span>
+                        <span class="hidden sm:inline">Buy me a coffee</span>
+                    </a>
+                    <button @click="toggleTheme()" class="flex size-10 items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all" aria-label="Toggle theme">
+                        <span x-text="dark ? '🌙' : '☀️'" class="text-lg"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SEARCH -->
+    <section class="mx-auto max-w-6xl px-4 sm:px-6 pt-6">
+        <div class="relative">
+            <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-lg">🔍</span>
+            <input type="text"
+                   x-model.debounce.150ms="query"
+                   placeholder="Search commands, tags, or descriptions..."
+                   class="w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-3.5 pl-12 pr-20 text-base outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 placeholder:text-zinc-400 transition-all">
+            <kbd class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center gap-1 rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 font-mono text-xs text-zinc-400">
+                Ctrl K
+            </kbd>
+        </div>
+        <p class="mt-2 text-sm text-zinc-500" x-show="filtered.length !== commands.length" x-transition>
+            Showing <span class="font-semibold text-zinc-900 dark:text-zinc-100" x-text="filtered.length"></span> of <span x-text="commands.length"></span> commands
+        </p>
+    </section>
+
+    <!-- NAV TABS -->
+    <nav class="mx-auto max-w-6xl px-4 sm:px-6 pt-4">
+        <div class="flex gap-1 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+            <template x-for="cat in categories" :key="cat.key">
+                <button @click="activeCat = cat.key"
+                        :class="activeCat === cat.key
+                            ? 'bg-orange-100 dark:bg-orange-950/50 text-orange-600 dark:text-orange-400'
+                            : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'"
+                        class="flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-all">
+                    <span x-text="cat.icon"></span>
+                    <span x-text="cat.label"></span>
+                    <span :class="activeCat === cat.key ? 'bg-orange-500 text-white' : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-400'"
+                          class="ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold"
+                          x-text="commands.filter(c => cat.key === 'all' || c.cat === cat.key).length"></span>
+                </button>
+            </template>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="mx-auto max-w-6xl px-4 sm:px-6 py-8">
+        <!-- Categories -->
+        <template x-for="cat in visibleCategories" :key="cat.key">
+            <section :class="cat.colorClass" class="mb-12">
+                <div class="flex items-center gap-3 mb-5 pb-3 border-b border-zinc-200 dark:border-zinc-800">
+                    <div class="flex size-9 items-center justify-center rounded-lg text-lg" :class="cat.iconBg">
+                        <span x-text="cat.icon"></span>
+                    </div>
+                    <h2 class="text-xl font-bold tracking-tight" x-text="cat.label"></h2>
+                    <span class="ml-auto text-sm text-zinc-400" x-text="cat.desc"></span>
+                </div>
+
+                <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    <template x-for="cmd in filteredByCategory(cat.key)" :key="cmd.title + cmd.code">
+                        <div class="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-lg hover:shadow-zinc-200/50 dark:hover:shadow-zinc-900/50 hover:-translate-y-0.5 transition-all">
+                            <div class="flex items-center gap-2 mb-3">
+                                <h3 class="text-sm font-semibold truncate" x-text="cmd.title"></h3>
+                                <span class="ml-auto shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+                                      :class="cat.badgeClass"
+                                      x-text="cmd.cat"></span>
+                            </div>
+
+                            <!-- Code Block - Fixed Overflow -->
+                            <div class="relative rounded-lg bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/50">
+                                <pre class="code-block overflow-x-auto whitespace-pre text-sm font-mono py-3 pr-10 pl-3 text-zinc-800 dark:text-zinc-200 leading-relaxed"
+                                     x-text="cmd.code"></pre>
+                                <button @click="copyCode(cmd.code, $el)"
+                                        class="absolute top-1.5 right-1.5 flex size-7 items-center justify-center rounded-md text-zinc-400 opacity-0 group-hover:opacity-100 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:text-zinc-700 dark:hover:text-zinc-200 transition-all"
+                                        aria-label="Copy command">
+                                    <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400 leading-snug" x-text="cmd.desc"></p>
+
+                            <div class="mt-2 flex flex-wrap gap-1">
+                                <template x-for="tag in cmd.tags" :key="tag">
+                                    <span class="rounded-full bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[11px] text-zinc-500 dark:text-zinc-400" x-text="tag"></span>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </section>
+        </template>
+
+        <!-- No Results -->
+        <div x-show="filtered.length === 0" x-cloak class="py-16 text-center">
+            <div class="text-5xl mb-4">🔍</div>
+            <h3 class="text-lg font-semibold mb-1">No commands found</h3>
+            <p class="text-zinc-500 text-sm">Try a different search term or clear the filter.</p>
+        </div>
+
+        <!-- DONATE SECTION -->
+        <section id="donate" class="mt-16 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-8 sm:p-12 text-center relative overflow-hidden">
+            <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-orange-500 via-amber-500 via-green-500 via-blue-500 to-purple-500"></div>
+            <div class="text-5xl mb-4">☕</div>
+            <h2 class="text-2xl font-bold tracking-tight mb-2">Enjoying this cheatsheet?</h2>
+            <p class="text-zinc-500 dark:text-zinc-400 max-w-md mx-auto mb-8 leading-relaxed">
+                This tool is free and always will be. If it saved you time, consider buying me a coffee. Your support keeps me building more tools like this.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <a href="https://github.com/sponsors/" target="_blank" rel="noopener"
+                   class="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white hover:bg-orange-600 hover:shadow-lg hover:shadow-orange-500/25 hover:-translate-y-0.5 transition-all">
+                    <svg class="size-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>
+                    GitHub Sponsors
+                </a>
+                <a href="https://buymeacoffee.com/" target="_blank" rel="noopener"
+                   class="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-6 py-3 text-sm font-semibold hover:border-zinc-300 dark:hover:border-zinc-600 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                    <svg class="size-5" viewBox="0 0 24 24" fill="currentColor"><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM2 21h18v-2H2v2z"/></svg>
+                    Buy Me a Coffee
+                </a>
+                <a href="https://ko-fi.com/" target="_blank" rel="noopener"
+                   class="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-6 py-3 text-sm font-semibold hover:border-zinc-300 dark:hover:border-zinc-600 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                    <svg class="size-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                    Ko-fi
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-zinc-200 dark:border-zinc-800 py-6 text-center text-sm text-zinc-400">
+        Made with ❤️ by <a href="https://github.com/" target="_blank" class="text-orange-500 hover:underline">Your Name</a> — Free & Open Source
+    </footer>
+
+    <!-- TOAST -->
+    <div x-show="toast.show"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 translate-y-4"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 translate-y-4"
+         x-cloak
+         class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-xl bg-zinc-900 dark:bg-zinc-100 px-5 py-3 text-sm font-medium text-white dark:text-zinc-900 shadow-xl">
+        <span>✅</span>
+        <span x-text="toast.message"></span>
+    </div>
+
+    <script>
+        function cheatsheet() {
+            return {
+                dark: true,
+                query: '',
+                activeCat: 'all',
+                toast: { show: false, message: '' },
+                categories: [
+                    { key: 'all', icon: '📋', label: 'All', desc: '', iconBg: '', badgeClass: '', colorClass: '' },
+                    { key: 'basics', icon: '📦', label: 'Basics', desc: 'Initialize, clone, and inspect', iconBg: 'bg-green-100 dark:bg-green-900/30', badgeClass: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400', colorClass: '' },
+                    { key: 'staging', icon: '📝', label: 'Staging & Commit', desc: 'Add, commit, and manage changes', iconBg: 'bg-yellow-100 dark:bg-yellow-900/30', badgeClass: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400', colorClass: '' },
+                    { key: 'branching', icon: '🌿', label: 'Branching', desc: 'Create, switch, merge, rebase', iconBg: 'bg-blue-100 dark:bg-blue-900/30', badgeClass: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400', colorClass: '' },
+                    { key: 'remote', icon: '🌐', label: 'Remote', desc: 'Push, pull, fetch, manage remotes', iconBg: 'bg-purple-100 dark:bg-purple-900/30', badgeClass: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400', colorClass: '' },
+                    { key: 'undo', icon: '↩️', label: 'Undo & Stash', desc: 'Reset, revert, and stash', iconBg: 'bg-red-100 dark:bg-red-900/30', badgeClass: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400', colorClass: '' },
+                    { key: 'advanced', icon: '⚡', label: 'Advanced', desc: 'Cherry-pick, bisect, reflog', iconBg: 'bg-cyan-100 dark:bg-cyan-900/30', badgeClass: 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400', colorClass: '' },
+                    { key: 'config', icon: '⚙️', label: 'Config', desc: 'User, editor, credentials', iconBg: 'bg-pink-100 dark:bg-pink-900/30', badgeClass: 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400', colorClass: '' },
+                    { key: 'workflow', icon: '🔄', label: 'Workflow', desc: 'Submodules, archives, cleanup', iconBg: 'bg-indigo-100 dark:bg-indigo-900/30', badgeClass: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400', colorClass: '' },
+                ],
+                commands: [
+                    // BASICS
+                    { cat: 'basics', title: 'Initialize Repository', code: 'git init', desc: 'Create a new Git repository in the current directory.', tags: ['start', 'new'] },
+                    { cat: 'basics', title: 'Clone Repository', code: 'git clone <url>', desc: 'Clone a remote repository to your local machine.', tags: ['download', 'remote'] },
+                    { cat: 'basics', title: 'Clone Specific Branch', code: 'git clone -b <branch> <url>', desc: 'Clone a specific branch from a remote repository.', tags: ['branch', 'remote'] },
+                    { cat: 'basics', title: 'Check Status', code: 'git status', desc: 'Show the working tree status — modified, staged, and untracked files.', tags: ['info', 'state'] },
+                    { cat: 'basics', title: 'View Log', code: 'git log', desc: 'Show commit history with author, date, and message.', tags: ['history', 'commits'] },
+                    { cat: 'basics', title: 'Pretty Log (One Line)', code: 'git log --oneline --graph --decorate', desc: 'Compact, visual commit history with branch decorations.', tags: ['history', 'visual'] },
+                    { cat: 'basics', title: 'Show Changes', code: 'git diff', desc: 'Show unstaged changes between working directory and index.', tags: ['changes', 'compare'] },
+                    { cat: 'basics', title: 'Show Staged Changes', code: 'git diff --staged', desc: 'Show changes between index and last commit (what will be committed).', tags: ['changes', 'staged'] },
+                    { cat: 'basics', title: 'View Commit Content', code: 'git show <commit>', desc: 'Show metadata and content changes of a specific commit.', tags: ['commit', 'view'] },
+
+                    // STAGING
+                    { cat: 'staging', title: 'Stage a File', code: 'git add <file>', desc: 'Add a specific file to the staging area.', tags: ['stage', 'add'] },
+                    { cat: 'staging', title: 'Stage All Changes', code: 'git add .', desc: 'Stage all new and modified files in the current directory.', tags: ['stage', 'all'] },
+                    { cat: 'staging', title: 'Stage All Including Deleted', code: 'git add -A', desc: 'Stage all changes including deletions across the entire repo.', tags: ['stage', 'all', 'delete'] },
+                    { cat: 'staging', title: 'Stage Interactively', code: 'git add -p', desc: 'Review and stage changes hunk by hunk (patch mode).', tags: ['stage', 'interactive', 'partial'] },
+                    { cat: 'staging', title: 'Commit Changes', code: 'git commit -m "message"', desc: 'Commit staged changes with a descriptive message.', tags: ['commit', 'save'] },
+                    { cat: 'staging', title: 'Commit with Details', code: 'git commit -m "title" -m "description"', desc: 'Commit with a title and a detailed body message.', tags: ['commit', 'detailed'] },
+                    { cat: 'staging', title: 'Amend Last Commit', code: 'git commit --amend', desc: 'Modify the most recent commit (message or changes).', tags: ['commit', 'edit', 'fix'] },
+                    { cat: 'staging', title: 'Amend Without Changing Message', code: 'git commit --amend --no-edit', desc: 'Add staged changes to the last commit without editing the message.', tags: ['commit', 'add'] },
+                    { cat: 'staging', title: 'Unstage a File', code: 'git restore --staged <file>', desc: 'Remove a file from the staging area (keep changes in working dir).', tags: ['unstage', 'remove'] },
+                    { cat: 'staging', title: 'Discard Changes in File', code: 'git restore <file>', desc: 'Discard local changes in a file and restore to last committed state.', tags: ['discard', 'reset'] },
+
+                    // BRANCHING
+                    { cat: 'branching', title: 'List Branches', code: 'git branch', desc: 'List all local branches. Current branch is marked with *.', tags: ['list', 'branches'] },
+                    { cat: 'branching', title: 'Create Branch', code: 'git branch <name>', desc: 'Create a new branch from the current HEAD.', tags: ['create', 'new'] },
+                    { cat: 'branching', title: 'Create & Switch', code: 'git checkout -b <name>', desc: 'Create a new branch and switch to it immediately.', tags: ['create', 'switch'] },
+                    { cat: 'branching', title: 'Switch Branch', code: 'git checkout <branch>', desc: 'Switch to an existing branch.', tags: ['switch', 'change'] },
+                    { cat: 'branching', title: 'Switch (New Syntax)', code: 'git switch <branch>', desc: 'Modern alternative to checkout for switching branches.', tags: ['switch', 'modern'] },
+                    { cat: 'branching', title: 'Delete Branch', code: 'git branch -d <name>', desc: 'Delete a branch (only if fully merged).', tags: ['delete', 'remove'] },
+                    { cat: 'branching', title: 'Force Delete Branch', code: 'git branch -D <name>', desc: 'Force delete a branch even if not merged.', tags: ['delete', 'force'] },
+                    { cat: 'branching', title: 'Merge Branch', code: 'git merge <branch>', desc: 'Merge the specified branch into the current branch.', tags: ['merge', 'combine'] },
+                    { cat: 'branching', title: 'Merge Without Commit', code: 'git merge --no-commit --no-ff <branch>', desc: 'Merge changes but stop before committing for review.', tags: ['merge', 'review'] },
+                    { cat: 'branching', title: 'Rebase onto Branch', code: 'git rebase <branch>', desc: 'Replay current branch commits on top of another branch.', tags: ['rebase', 'rewrite'] },
+                    { cat: 'branching', title: 'Rename Branch', code: 'git branch -m <old> <new>', desc: 'Rename a local branch.', tags: ['rename', 'change'] },
+
+                    // REMOTE
+                    { cat: 'remote', title: 'List Remotes', code: 'git remote -v', desc: 'List all configured remote repositories with URLs.', tags: ['list', 'urls'] },
+                    { cat: 'remote', title: 'Add Remote', code: 'git remote add origin <url>', desc: 'Add a new remote repository named "origin".', tags: ['add', 'setup'] },
+                    { cat: 'remote', title: 'Change Remote URL', code: 'git remote set-url origin <url>', desc: 'Update the URL of an existing remote.', tags: ['change', 'url'] },
+                    { cat: 'remote', title: 'Fetch Updates', code: 'git fetch origin', desc: 'Download objects and refs from remote without merging.', tags: ['download', 'update'] },
+                    { cat: 'remote', title: 'Pull Changes', code: 'git pull origin <branch>', desc: 'Fetch and merge remote changes into current branch.', tags: ['download', 'merge'] },
+                    { cat: 'remote', title: 'Push Changes', code: 'git push origin <branch>', desc: 'Upload local commits to the remote branch.', tags: ['upload', 'push'] },
+                    { cat: 'remote', title: 'Push & Set Upstream', code: 'git push -u origin <branch>', desc: 'Push and set the remote branch as the default tracking branch.', tags: ['upload', 'track'] },
+                    { cat: 'remote', title: 'Force Push (Safe)', code: 'git push --force-with-lease', desc: 'Safely force push — only if remote hasn\'t changed.', tags: ['force', 'overwrite'] },
+                    { cat: 'remote', title: 'Delete Remote Branch', code: 'git push origin --delete <branch>', desc: 'Delete a branch from the remote repository.', tags: ['delete', 'remote'] },
+                    { cat: 'remote', title: 'View Remote Branches', code: 'git branch -r', desc: 'List all remote-tracking branches.', tags: ['list', 'remote'] },
+
+                    // UNDO
+                    { cat: 'undo', title: 'Undo Last Commit (Keep Changes)', code: 'git reset --soft HEAD~1', desc: 'Undo the last commit but keep all changes staged.', tags: ['undo', 'soft'] },
+                    { cat: 'undo', title: 'Undo Last Commit (Unstage)', code: 'git reset --mixed HEAD~1', desc: 'Undo the last commit and unstage changes (default behavior).', tags: ['undo', 'unstage'] },
+                    { cat: 'undo', title: 'Hard Reset to Commit', code: 'git reset --hard <commit>', desc: 'Reset to a specific commit, discarding all changes after it.', tags: ['undo', 'destroy', 'hard'] },
+                    { cat: 'undo', title: 'Revert a Commit', code: 'git revert <commit>', desc: 'Create a new commit that undoes the changes of a specific commit.', tags: ['undo', 'safe', 'public'] },
+                    { cat: 'undo', title: 'Revert Multiple Commits', code: 'git revert <oldest>^..<newest>', desc: 'Revert a range of commits in reverse order.', tags: ['undo', 'range'] },
+                    { cat: 'undo', title: 'Stash Changes', code: 'git stash', desc: 'Temporarily save uncommitted changes and clean the working directory.', tags: ['save', 'temporary'] },
+                    { cat: 'undo', title: 'Stash with Message', code: 'git stash push -m "description"', desc: 'Save changes with a descriptive label.', tags: ['save', 'label'] },
+                    { cat: 'undo', title: 'Apply Stash', code: 'git stash pop', desc: 'Restore the most recent stash and remove it from the list.', tags: ['restore', 'apply'] },
+                    { cat: 'undo', title: 'List Stashes', code: 'git stash list', desc: 'Show all saved stashes.', tags: ['list', 'stashes'] },
+                    { cat: 'undo', title: 'Drop Stash', code: 'git stash drop stash@{n}', desc: 'Delete a specific stash.', tags: ['delete', 'stash'] },
+
+                    // ADVANCED
+                    { cat: 'advanced', title: 'Cherry-Pick Commit', code: 'git cherry-pick <commit>', desc: 'Apply the changes from a specific commit to the current branch.', tags: ['apply', 'select'] },
+                    { cat: 'advanced', title: 'Interactive Rebase', code: 'git rebase -i HEAD~n', desc: 'Edit, squash, reorder, or drop the last n commits interactively.', tags: ['rebase', 'edit', 'squash'] },
+                    { cat: 'advanced', title: 'Find Commit by Content', code: 'git log -S "search text" --oneline', desc: 'Search for commits that added or removed specific text.', tags: ['search', 'grep'] },
+                    { cat: 'advanced', title: 'Blame a File', code: 'git blame <file>', desc: 'Show who last modified each line of a file.', tags: ['history', 'author'] },
+                    { cat: 'advanced', title: 'Tag a Release', code: 'git tag -a v1.0.0 -m "Release v1.0.0"', desc: 'Create an annotated tag for a release.', tags: ['release', 'version'] },
+                    { cat: 'advanced', title: 'Push Tags', code: 'git push origin --tags', desc: 'Push all local tags to the remote repository.', tags: ['push', 'tags'] },
+                    { cat: 'advanced', title: 'Create Worktree', code: 'git worktree add ../fix-bug <branch>', desc: 'Create a linked working directory for parallel work.', tags: ['parallel', 'work'] },
+                    { cat: 'advanced', title: 'Show Reflog', code: 'git reflog', desc: 'Show a log of all HEAD movements — recover lost commits.', tags: ['recover', 'history'] },
+                    { cat: 'advanced', title: 'Clean Untracked Files', code: 'git clean -fd', desc: 'Remove untracked files and directories (dry-run with -n first!).', tags: ['clean', 'remove'] },
+                    { cat: 'advanced', title: 'Bisect for Bugs', code: 'git bisect start\ngit bisect bad\ngit bisect good <commit>', desc: 'Binary search through commit history to find the bug-introducing commit.', tags: ['debug', 'search'] },
+
+                    // CONFIG
+                    { cat: 'config', title: 'Set User Name', code: 'git config --global user.name "Your Name"', desc: 'Set the global author name for all commits.', tags: ['setup', 'identity'] },
+                    { cat: 'config', title: 'Set User Email', code: 'git config --global user.email "email@example.com"', desc: 'Set the global author email for all commits.', tags: ['setup', 'identity'] },
+                    { cat: 'config', title: 'Set Default Branch', code: 'git config --global init.defaultBranch main', desc: 'Change the default branch name from "master" to "main".', tags: ['setup', 'branch'] },
+                    { cat: 'config', title: 'Set Default Editor', code: 'git config --global core.editor "vim"', desc: 'Set the default text editor for commit messages.', tags: ['setup', 'editor'] },
+                    { cat: 'config', title: 'Enable Autocorrect', code: 'git config --global help.autocorrect 1', desc: 'Auto-run commands when there\'s a close match to a typo.', tags: ['setup', 'typo'] },
+                    { cat: 'config', title: 'View All Config', code: 'git config --list', desc: 'Display all current Git configuration settings.', tags: ['view', 'settings'] },
+                    { cat: 'config', title: 'Credential Helper (Cache)', code: 'git config --global credential.helper "cache --timeout=3600"', desc: 'Cache credentials in memory for 1 hour.', tags: ['auth', 'password'] },
+                    { cat: 'config', title: 'Credential Helper (Store)', code: 'git config --global credential.helper store', desc: 'Permanently store credentials on disk (less secure).', tags: ['auth', 'permanent'] },
+
+                    // WORKFLOW
+                    { cat: 'workflow', title: 'Create .gitignore', code: 'touch .gitignore\necho "node_modules/" >> .gitignore', desc: 'Create and configure files/directories Git should ignore.', tags: ['ignore', 'setup'] },
+                    { cat: 'workflow', title: 'Add Submodule', code: 'git submodule add <url> <path>', desc: 'Add another Git repository as a submodule.', tags: ['submodule', 'external'] },
+                    { cat: 'workflow', title: 'Update Submodules', code: 'git submodule update --init --recursive', desc: 'Initialize and update all submodules recursively.', tags: ['submodule', 'update'] },
+                    { cat: 'workflow', title: 'Archive Repository', code: 'git archive --format=zip HEAD -o project.zip', desc: 'Create a ZIP archive of the current HEAD without .git folder.', tags: ['export', 'zip'] },
+                    { cat: 'workflow', title: 'Contributor Stats', code: 'git shortlog -sn --all', desc: 'Show commit count per contributor across all branches.', tags: ['stats', 'team'] },
+                    { cat: 'workflow', title: 'Compare Branches', code: 'git diff main..feature', desc: 'Show all differences between two branches.', tags: ['compare', 'diff'] },
+                    { cat: 'workflow', title: 'Find Merged Branches', code: 'git branch --merged', desc: 'List branches that have been merged into the current branch.', tags: ['merged', 'cleanup'] },
+                    { cat: 'workflow', title: 'Delete Merged Branches', code: 'git branch --merged | grep -v "\\*\\|main\\|master" | xargs git branch -d', desc: 'Safely delete all branches merged into current (except main/master).', tags: ['cleanup', 'delete'] },
+                    { cat: 'workflow', title: 'Show Ignored Files', code: 'git status --ignored', desc: 'List files that are being ignored by .gitignore.', tags: ['ignore', 'view'] },
+                    { cat: 'workflow', title: 'Sparse Checkout', code: 'git sparse-checkout init --cone\ngit sparse-checkout set <dir>', desc: 'Checkout only specific directories from a large repository.', tags: ['partial', 'large-repo'] },
+                ],
+
+                get filtered() {
+                    const q = this.query.toLowerCase().trim();
+                    if (!q && this.activeCat === 'all') return this.commands;
+                    return this.commands.filter(c => {
+                        const matchCat = this.activeCat === 'all' || c.cat === this.activeCat;
+                        const matchQuery = !q ||
+                            c.title.toLowerCase().includes(q) ||
+                            c.code.toLowerCase().includes(q) ||
+                            c.desc.toLowerCase().includes(q) ||
+                            c.tags.some(t => t.includes(q));
+                        return matchCat && matchQuery;
+                    });
+                },
+
+                get visibleCategories() {
+                    const cats = this.categories.filter(c => c.key !== 'all');
+                    if (this.activeCat !== 'all') {
+                        return cats.filter(c => c.key === this.activeCat);
+                    }
+                    // Only show categories that have visible commands
+                    return cats.filter(c => this.filtered.some(cmd => cmd.cat === c.key));
+                },
+
+                filteredByCategory(catKey) {
+                    return this.filtered.filter(c => c.cat === catKey);
+                },
+
+                copyCode(code, btn) {
+                    navigator.clipboard.writeText(code).then(() => {
+                        this.showToast('Copied to clipboard!');
+                        const svg = btn.querySelector('svg');
+                        svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>';
+                        btn.classList.add('text-green-500');
+                        setTimeout(() => {
+                            svg.innerHTML = '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>';
+                            btn.classList.remove('text-green-500');
+                        }, 2000);
+                    });
+                },
+
+                showToast(msg) {
+                    this.toast = { show: true, message: msg };
+                    setTimeout(() => this.toast.show = false, 2500);
+                },
+
+                toggleTheme() {
+                    this.dark = !this.dark;
+                    document.documentElement.classList.toggle('dark', this.dark);
+                    localStorage.setItem('git-cheatsheet-theme', this.dark ? 'dark' : 'light');
+                },
+
+                init() {
+                    const saved = localStorage.getItem('git-cheatsheet-theme');
+                    if (saved === 'light') {
+                        this.dark = false;
+                        document.documentElement.classList.remove('dark');
+                    }
+                }
+            }
+        }
+
+        // Keyboard shortcut
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                document.querySelector('input[type="text"]').focus();
+            }
+            if (e.key === 'Escape') {
+                const input = document.querySelector('input[type="text"]');
+                if (document.activeElement === input) {
+                    input.blur();
+                    if (input.value) {
+                        input.value = '';
+                        input.dispatchEvent(new Event('input'));
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
