@@ -107,7 +107,7 @@
 
                 <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     <template x-for="cmd in filteredByCategory(cat.key)" :key="cmd.title + cmd.code">
-                        <div class="group rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-lg hover:shadow-zinc-200/50 dark:hover:shadow-zinc-900/50 hover:-translate-y-0.5 transition-all">
+                        <div class="group min-w-0 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-lg hover:shadow-zinc-200/50 dark:hover:shadow-zinc-900/50 hover:-translate-y-0.5 transition-all">
                             <div class="flex items-center gap-2 mb-3">
                                 <h3 class="text-sm font-semibold truncate" x-text="cmd.title"></h3>
                                 <span class="ml-auto shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
@@ -116,7 +116,7 @@
                             </div>
 
                             <!-- Code Block - Fixed Overflow -->
-                            <div class="relative rounded-lg bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/50">
+                            <div class="relative rounded-lg bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/50 overflow-hidden">
                                 <pre class="code-block overflow-x-auto whitespace-pre text-sm font-mono py-3 pr-10 pl-3 text-zinc-800 dark:text-zinc-200 leading-relaxed"
                                      x-text="cmd.code"></pre>
                                 <button @click="copyCode(cmd.code, $el)"
