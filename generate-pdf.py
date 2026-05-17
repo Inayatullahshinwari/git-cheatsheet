@@ -65,7 +65,7 @@ def bg_callback(canvas, doc):
     canvas.rect(0, 0, doc.pagesize[0], doc.pagesize[1], fill=1, stroke=0)
     canvas.setFont("Courier", 6.5)
     canvas.setFillColor(DIM)
-    canvas.drawRightString(doc.pagesize[0] - 15*mm, 8*mm, "@Inayatullahshinwari")
+    canvas.drawRightString(doc.pagesize[0] - 15*mm, 8*mm, "github.com/Inayatullahshinwari")
     canvas.restoreState()
 
 def make_center_table(paragraph, bg=BG, padding=0, w=None):
