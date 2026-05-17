@@ -10,8 +10,6 @@ from reportlab.platypus import (
     PageBreak, NextPageTemplate
 )
 from reportlab.lib.enums import TA_LEFT, TA_CENTER
-from reportlab.graphics.shapes import Drawing, Rect, String, Line, Group
-from reportlab.graphics import renderPDF
 import re
 import sys
 import os
@@ -70,21 +68,8 @@ def bg_callback(canvas, doc):
     canvas.drawRightString(doc.pagesize[0] - 15*mm, 8*mm, "github.com/Inayatullahshinwari")
     canvas.restoreState()
 
-def make_center_table(element, bg=BG, padding=0, w=None):
-    if isinstance(element, Drawing):
-        data = [[element]]
-        t = Table(data, colWidths=[w] if w else None)
-        t.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), bg),
-            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-            ("TOPPADDING", (0, 0), (-1, -1), padding),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), padding),
-            ("LEFTPADDING", (0, 0), (-1, -1), 0),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 0),
-        ]))
-        return t
-    data = [[element]]
+def make_center_table(paragraph, bg=BG, padding=0, w=None):
+    data = [[paragraph]]
     t = Table(data, colWidths=[w] if w else None)
     t.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), bg),
@@ -158,72 +143,6 @@ def build_pdf(commands, output_path):
     story.append(make_center_table(Paragraph("By Inayatullah Shinwari", cover_author), w=content_w))
     story.append(Spacer(1, 3*mm))
     story.append(make_center_table(Paragraph("https://inayatullahshinwari.github.io/git-cheatsheet", cover_link), w=content_w))
-    story.append(PageBreak())
-
-    # GIT ARCHITECTURE DIAGRAM - Using Drawing API for clean shapes
-    story.append(Spacer(1, 15*mm))
-    story.append(make_center_table(Paragraph("Git Architecture", ParagraphStyle("archTitle", fontName="Helvetica-Bold", fontSize=20, textColor=FG, leading=26, spaceAfter=4, alignment=TA_CENTER)), w=content_w))
-    story.append(Spacer(1, 2*mm))
-    story.append(make_center_table(Paragraph("How commands move your code", ParagraphStyle("archSub", fontName="Helvetica", fontSize=10, textColor=MUTED, leading=14, alignment=TA_CENTER)), w=content_w))
-    story.append(Spacer(1, 8*mm))
-
-    # Create architecture drawing
-    dw = content_w
-    dh = 120*mm
-    d = Drawing(dw, dh)
-
-    # Box definitions: (x, y, w, h, title, desc, sub, fill, stroke)
-    boxes = [
-        (8*mm, 25*mm, 100*mm, 60*mm, "Working Directory", "Your files on disk", "untracked + modified", HexColor("#1e3a5f"), HexColor("#3b82f6")),
-        (128*mm, 25*mm, 100*mm, 60*mm, "Staging Area", "Index / Cache", "staged changes", HexColor("#4a4010"), HexColor("#eab308")),
-        (248*mm, 25*mm, 100*mm, 60*mm, "Local Repository", ".git directory", "commits + branches", HexColor("#14402a"), HexColor("#22c55e")),
-        (368*mm, 25*mm, 80*mm, 60*mm, "Remote", "GitHub / GitLab", "shared history", HexColor("#3b1f5e"), HexColor("#a855f7")),
-    ]
-
-    for x, y, w, h, title, desc, sub, fill, stroke in boxes:
-        d.add(Rect(x, y, w, h, fillColor=fill, strokeColor=stroke, strokeWidth=1.5, rx=8, ry=8))
-        d.add(String(x + w/2, y + h - 18*mm, title, textAnchor="middle", fontName="Helvetica-Bold", fontSize=11, fillColor=FG))
-        d.add(String(x + w/2, y + h - 32*mm, desc, textAnchor="middle", fontName="Courier", fontSize=8, fillColor=MUTED))
-        d.add(String(x + w/2, y + h - 44*mm, sub, textAnchor="middle", fontName="Courier", fontSize=7, fillColor=MUTED))
-
-    # Arrows between boxes
-    arrow_y = 55*mm
-    # add →
-    d.add(Line(108*mm, arrow_y, 126*mm, arrow_y, strokeColor=HexColor("#52525b"), strokeWidth=1.5))
-    d.add(Rect(110*mm, arrow_y - 8*mm, 14*mm, 16*mm, fillColor=HexColor("#18181b"), strokeColor=HexColor("#2a2a2a"), strokeWidth=1, rx=4, ry=4))
-    d.add(String(117*mm, arrow_y - 3*mm, "add", textAnchor="middle", fontName="Courier", fontSize=8, fillColor=HexColor("#22c55e")))
-
-    # restore ←
-    d.add(Line(126*mm, arrow_y - 12*mm, 108*mm, arrow_y - 12*mm, strokeColor=HexColor("#52525b"), strokeWidth=1.5))
-    d.add(Rect(110*mm, arrow_y - 20*mm, 14*mm, 16*mm, fillColor=HexColor("#18181b"), strokeColor=HexColor("#2a2a2a"), strokeWidth=1, rx=4, ry=4))
-    d.add(String(117*mm, arrow_y - 15*mm, "restore", textAnchor="middle", fontName="Courier", fontSize=7, fillColor=HexColor("#ef4444")))
-
-    # commit →
-    d.add(Line(228*mm, arrow_y, 246*mm, arrow_y, strokeColor=HexColor("#52525b"), strokeWidth=1.5))
-    d.add(Rect(230*mm, arrow_y - 8*mm, 14*mm, 16*mm, fillColor=HexColor("#18181b"), strokeColor=HexColor("#2a2a2a"), strokeWidth=1, rx=4, ry=4))
-    d.add(String(237*mm, arrow_y - 3*mm, "commit", textAnchor="middle", fontName="Courier", fontSize=8, fillColor=HexColor("#22c55e")))
-
-    # reset ←
-    d.add(Line(246*mm, arrow_y - 12*mm, 228*mm, arrow_y - 12*mm, strokeColor=HexColor("#52525b"), strokeWidth=1.5))
-    d.add(Rect(230*mm, arrow_y - 20*mm, 14*mm, 16*mm, fillColor=HexColor("#18181b"), strokeColor=HexColor("#2a2a2a"), strokeWidth=1, rx=4, ry=4))
-    d.add(String(237*mm, arrow_y - 15*mm, "reset", textAnchor="middle", fontName="Courier", fontSize=8, fillColor=HexColor("#ef4444")))
-
-    # push →
-    d.add(Line(348*mm, arrow_y, 366*mm, arrow_y, strokeColor=HexColor("#52525b"), strokeWidth=1.5))
-    d.add(Rect(350*mm, arrow_y - 8*mm, 14*mm, 16*mm, fillColor=HexColor("#18181b"), strokeColor=HexColor("#2a2a2a"), strokeWidth=1, rx=4, ry=4))
-    d.add(String(357*mm, arrow_y - 3*mm, "push", textAnchor="middle", fontName="Courier", fontSize=8, fillColor=HexColor("#22c55e")))
-
-    # pull ←
-    d.add(Line(366*mm, arrow_y - 12*mm, 348*mm, arrow_y - 12*mm, strokeColor=HexColor("#52525b"), strokeWidth=1.5))
-    d.add(Rect(350*mm, arrow_y - 20*mm, 14*mm, 16*mm, fillColor=HexColor("#18181b"), strokeColor=HexColor("#2a2a2a"), strokeWidth=1, rx=4, ry=4))
-    d.add(String(357*mm, arrow_y - 15*mm, "pull", textAnchor="middle", fontName="Courier", fontSize=8, fillColor=HexColor("#3b82f6")))
-
-    # Add drawing to story
-    story.append(make_center_table(d, w=content_w))
-    story.append(Spacer(1, 6*mm))
-    story.append(make_center_table(div_table, w=content_w))
-    story.append(Spacer(1, 6*mm))
-    story.append(make_center_table(Paragraph("Hover over commands on the web version to see descriptions", ParagraphStyle("archNote", fontName="Helvetica-Oblique", fontSize=8, textColor=DIM, leading=11, alignment=TA_CENTER)), w=content_w))
     story.append(PageBreak())
 
     # COMMANDS
