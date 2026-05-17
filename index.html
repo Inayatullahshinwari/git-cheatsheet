@@ -138,162 +138,6 @@
         </p>
     </section>
 
-    <!-- GIT ARCHITECTURE DIAGRAM -->
-    <section class="mx-auto max-w-6xl px-4 sm:px-6 pt-8 pb-4" x-data="{ hoveredCmd: null, showDiagram: true }">
-        <div class="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 sm:p-8 relative overflow-hidden">
-            <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-orange-500/50 to-transparent"></div>
-            <div class="flex items-center gap-2 mb-6">
-                <span class="text-lg">🏗️</span>
-                <h2 class="text-lg font-bold tracking-tight">Git Architecture</h2>
-                <span class="ml-auto text-xs text-zinc-400 hidden sm:block">How commands move your code</span>
-                <button @click="showDiagram = !showDiagram" class="ml-2 text-xs text-zinc-500 hover:text-zinc-300 transition-colors" x-text="showDiagram ? 'hide' : 'show'"></button>
-            </div>
-
-            <div x-show="showDiagram" x-collapse>
-            <!-- Desktop SVG Diagram -->
-            <div class="hidden sm:block relative">
-                <svg viewBox="0 0 900 200" class="w-full h-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="boxGrad1" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.15"/>
-                            <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.05"/>
-                        </linearGradient>
-                        <linearGradient id="boxGrad2" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="#eab308" stop-opacity="0.15"/>
-                            <stop offset="100%" stop-color="#eab308" stop-opacity="0.05"/>
-                        </linearGradient>
-                        <linearGradient id="boxGrad3" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="#22c55e" stop-opacity="0.15"/>
-                            <stop offset="100%" stop-color="#22c55e" stop-opacity="0.05"/>
-                        </linearGradient>
-                        <linearGradient id="boxGrad4" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="#a855f7" stop-opacity="0.15"/>
-                            <stop offset="100%" stop-color="#a855f7" stop-opacity="0.05"/>
-                        </linearGradient>
-                        <marker id="arrowHead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-                            <path d="M0,0 L8,3 L0,6 Z" fill="#52525b"/>
-                        </marker>
-                    </defs>
-
-                    <!-- BOX 1: Working Directory -->
-                    <rect x="20" y="30" width="180" height="110" rx="12" fill="url(#boxGrad1)" stroke="#3b82f6" stroke-width="1.5"/>
-                    <text x="110" y="65" text-anchor="middle" class="svg-title" font-family="Inter, sans-serif" font-size="14" font-weight="600">Working Directory</text>
-                    <text x="110" y="88" text-anchor="middle" class="svg-muted" font-family="JetBrains Mono, monospace" font-size="10">Your files on disk</text>
-                    <text x="110" y="108" text-anchor="middle" class="svg-muted" font-family="JetBrains Mono, monospace" font-size="9">untracked + modified</text>
-
-                    <!-- BOX 2: Staging Area -->
-                    <rect x="260" y="30" width="180" height="110" rx="12" fill="url(#boxGrad2)" stroke="#eab308" stroke-width="1.5"/>
-                    <text x="350" y="65" text-anchor="middle" class="svg-title" font-family="Inter, sans-serif" font-size="14" font-weight="600">Staging Area</text>
-                    <text x="350" y="88" text-anchor="middle" class="svg-muted" font-family="JetBrains Mono, monospace" font-size="10">Index / Cache</text>
-                    <text x="350" y="108" text-anchor="middle" class="svg-muted" font-family="JetBrains Mono, monospace" font-size="9">staged changes</text>
-
-                    <!-- BOX 3: Local Repository -->
-                    <rect x="500" y="30" width="180" height="110" rx="12" fill="url(#boxGrad3)" stroke="#22c55e" stroke-width="1.5"/>
-                    <text x="590" y="65" text-anchor="middle" class="svg-title" font-family="Inter, sans-serif" font-size="14" font-weight="600">Local Repository</text>
-                    <text x="590" y="88" text-anchor="middle" class="svg-muted" font-family="JetBrains Mono, monospace" font-size="10">.git directory</text>
-                    <text x="590" y="108" text-anchor="middle" class="svg-muted" font-family="JetBrains Mono, monospace" font-size="9">commits + branches</text>
-
-                    <!-- BOX 4: Remote Repository -->
-                    <rect x="740" y="30" width="140" height="110" rx="12" fill="url(#boxGrad4)" stroke="#a855f7" stroke-width="1.5"/>
-                    <text x="810" y="65" text-anchor="middle" class="svg-title" font-family="Inter, sans-serif" font-size="14" font-weight="600">Remote</text>
-                    <text x="810" y="88" text-anchor="middle" class="svg-muted" font-family="JetBrains Mono, monospace" font-size="10">GitHub / GitLab</text>
-                    <text x="810" y="108" text-anchor="middle" class="svg-muted" font-family="JetBrains Mono, monospace" font-size="9">shared history</text>
-
-                    <!-- ARROW 1: Working → Staging (git add) -->
-                    <line x1="200" y1="85" x2="258" y2="85" stroke="#52525b" stroke-width="1.5" marker-end="url(#arrowHead)"/>
-                    <g class="svg-cmd-group" @mouseenter="hoveredCmd = 'add'" @mouseleave="hoveredCmd = null">
-                        <rect class="svg-pill svg-pill-stroke" x="205" y="62" width="50" height="24" rx="6" stroke-width="1"/>
-                        <text x="230" y="78" text-anchor="middle" fill="#22c55e" font-family="JetBrains Mono, monospace" font-size="10" font-weight="500">add</text>
-                    </g>
-
-                    <!-- ARROW 2: Staging → Working (git restore) -->
-                    <line x1="258" y1="115" x2="200" y2="115" stroke="#52525b" stroke-width="1.5" marker-end="url(#arrowHead)"/>
-                    <g class="svg-cmd-group" @mouseenter="hoveredCmd = 'restore'" @mouseleave="hoveredCmd = null">
-                        <rect class="svg-pill svg-pill-stroke" x="205" y="103" width="50" height="24" rx="6" stroke-width="1"/>
-                        <text x="230" y="119" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono, monospace" font-size="10" font-weight="500">restore</text>
-                    </g>
-
-                    <!-- ARROW 3: Staging → Local (git commit) -->
-                    <line x1="440" y1="85" x2="498" y2="85" stroke="#52525b" stroke-width="1.5" marker-end="url(#arrowHead)"/>
-                    <g class="svg-cmd-group" @mouseenter="hoveredCmd = 'commit'" @mouseleave="hoveredCmd = null">
-                        <rect class="svg-pill svg-pill-stroke" x="445" y="62" width="50" height="24" rx="6" stroke-width="1"/>
-                        <text x="470" y="78" text-anchor="middle" fill="#22c55e" font-family="JetBrains Mono, monospace" font-size="10" font-weight="500">commit</text>
-                    </g>
-
-                    <!-- ARROW 4: Local → Staging (git reset) -->
-                    <line x1="498" y1="115" x2="440" y2="115" stroke="#52525b" stroke-width="1.5" marker-end="url(#arrowHead)"/>
-                    <g class="svg-cmd-group" @mouseenter="hoveredCmd = 'reset'" @mouseleave="hoveredCmd = null">
-                        <rect class="svg-pill svg-pill-stroke" x="445" y="103" width="50" height="24" rx="6" stroke-width="1"/>
-                        <text x="470" y="119" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono, monospace" font-size="10" font-weight="500">reset</text>
-                    </g>
-
-                    <!-- ARROW 5: Local → Remote (git push) -->
-                    <line x1="680" y1="85" x2="738" y2="85" stroke="#52525b" stroke-width="1.5" marker-end="url(#arrowHead)"/>
-                    <g class="svg-cmd-group" @mouseenter="hoveredCmd = 'push'" @mouseleave="hoveredCmd = null">
-                        <rect class="svg-pill svg-pill-stroke" x="685" y="62" width="50" height="24" rx="6" stroke-width="1"/>
-                        <text x="710" y="78" text-anchor="middle" fill="#22c55e" font-family="JetBrains Mono, monospace" font-size="10" font-weight="500">push</text>
-                    </g>
-
-                    <!-- ARROW 6: Remote → Local (git pull/fetch) -->
-                    <line x1="738" y1="115" x2="680" y2="115" stroke="#52525b" stroke-width="1.5" marker-end="url(#arrowHead)"/>
-                    <g class="svg-cmd-group" @mouseenter="hoveredCmd = 'pull'" @mouseleave="hoveredCmd = null">
-                        <rect class="svg-pill svg-pill-stroke" x="685" y="103" width="50" height="24" rx="6" stroke-width="1"/>
-                        <text x="710" y="119" text-anchor="middle" fill="#3b82f6" font-family="JetBrains Mono, monospace" font-size="9" font-weight="500">pull</text>
-                    </g>
-                </svg>
-
-                <!-- Hover tooltip - absolute positioned, no layout shift -->
-                <div class="absolute bottom-1 left-0 right-0 flex justify-center pointer-events-none">
-                    <div class="rounded-full border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-1.5 text-xs font-mono transition-all duration-150 shadow-sm"
-                         :class="hoveredCmd ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
-                        <span x-show="hoveredCmd === 'add'" x-cloak><span class="text-green-600 dark:text-green-500">git add</span> <span class="text-zinc-400">→</span> <span class="text-zinc-500 dark:text-zinc-400">Working directory → staging</span></span>
-                        <span x-show="hoveredCmd === 'restore'" x-cloak><span class="text-red-500 dark:text-red-400">git restore</span> <span class="text-zinc-400">→</span> <span class="text-zinc-500 dark:text-zinc-400">Discards changes, restores from HEAD</span></span>
-                        <span x-show="hoveredCmd === 'commit'" x-cloak><span class="text-green-600 dark:text-green-500">git commit</span> <span class="text-zinc-400">→</span> <span class="text-zinc-500 dark:text-zinc-400">Staging → permanent snapshot</span></span>
-                        <span x-show="hoveredCmd === 'reset'" x-cloak><span class="text-red-500 dark:text-red-400">git reset</span> <span class="text-zinc-400">→</span> <span class="text-zinc-500 dark:text-zinc-400">Unstages or moves HEAD back</span></span>
-                        <span x-show="hoveredCmd === 'push'" x-cloak><span class="text-green-600 dark:text-green-500">git push</span> <span class="text-zinc-400">→</span> <span class="text-zinc-500 dark:text-zinc-400">Local → remote repository</span></span>
-                        <span x-show="hoveredCmd === 'pull'" x-cloak><span class="text-blue-600 dark:text-blue-400">git pull</span> <span class="text-zinc-400">→</span> <span class="text-zinc-500 dark:text-zinc-400">Remote → local, merges changes</span></span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Mobile Version -->
-            <div class="sm:hidden space-y-3">
-                <div class="rounded-xl border border-blue-500/30 bg-blue-500/5 p-3 text-center">
-                    <div class="text-sm font-semibold text-blue-400">Working Directory</div>
-                    <div class="text-xs text-zinc-500 mt-0.5">Your files on disk</div>
-                </div>
-                <div class="flex items-center justify-center gap-2 text-xs">
-                    <span class="text-green-500 font-mono">git add ↓</span>
-                    <span class="text-zinc-600">|</span>
-                    <span class="text-red-400 font-mono">git restore ↑</span>
-                </div>
-                <div class="rounded-xl border border-yellow-500/30 bg-yellow-500/5 p-3 text-center">
-                    <div class="text-sm font-semibold text-yellow-400">Staging Area</div>
-                    <div class="text-xs text-zinc-500 mt-0.5">Index / Cache</div>
-                </div>
-                <div class="flex items-center justify-center gap-2 text-xs">
-                    <span class="text-green-500 font-mono">git commit ↓</span>
-                    <span class="text-zinc-600">|</span>
-                    <span class="text-red-400 font-mono">git reset ↑</span>
-                </div>
-                <div class="rounded-xl border border-green-500/30 bg-green-500/5 p-3 text-center">
-                    <div class="text-sm font-semibold text-green-400">Local Repository</div>
-                    <div class="text-xs text-zinc-500 mt-0.5">.git directory</div>
-                </div>
-                <div class="flex items-center justify-center gap-2 text-xs">
-                    <span class="text-green-500 font-mono">git push ↓</span>
-                    <span class="text-zinc-600">|</span>
-                    <span class="text-blue-400 font-mono">git pull ↑</span>
-                </div>
-                <div class="rounded-xl border border-purple-500/30 bg-purple-500/5 p-3 text-center">
-                    <div class="text-sm font-semibold text-purple-400">Remote Repository</div>
-                    <div class="text-xs text-zinc-500 mt-0.5">GitHub / GitLab</div>
-                </div>
-            </div>
-            </div>
-        </div>
-    </section>
-
     <!-- NAV TABS -->
     <nav class="mx-auto max-w-6xl px-4 sm:px-6 pt-4">
         <div class="flex gap-1 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
@@ -369,6 +213,149 @@
             <h3 class="text-lg font-semibold mb-1">No commands found</h3>
             <p class="text-zinc-500 text-sm">Try a different search term or clear the filter.</p>
         </div>
+
+        <!-- GIT ARCHITECTURE REFERENCE -->
+        <section class="mt-16 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 sm:p-8 relative overflow-hidden" x-data="{ hoveredCmd: null, showDiagram: true }">
+            <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-orange-500/50 to-transparent"></div>
+            <div class="flex items-center gap-2 mb-6">
+                <span class="text-lg">🏗️</span>
+                <h2 class="text-lg font-bold tracking-tight">Git Architecture</h2>
+                <span class="ml-auto text-xs text-zinc-400 hidden sm:block">How commands move your code</span>
+                <button @click="showDiagram = !showDiagram" class="ml-2 text-xs text-zinc-500 hover:text-zinc-300 transition-colors" x-text="showDiagram ? 'hide' : 'show'"></button>
+            </div>
+
+            <div x-show="showDiagram" x-collapse>
+            <!-- Desktop SVG Diagram -->
+            <div class="hidden sm:block relative">
+                <svg viewBox="0 0 900 200" class="w-full h-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="boxGrad1" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.15"/>
+                            <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.05"/>
+                        </linearGradient>
+                        <linearGradient id="boxGrad2" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#eab308" stop-opacity="0.15"/>
+                            <stop offset="100%" stop-color="#eab308" stop-opacity="0.05"/>
+                        </linearGradient>
+                        <linearGradient id="boxGrad3" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#22c55e" stop-opacity="0.15"/>
+                            <stop offset="100%" stop-color="#22c55e" stop-opacity="0.05"/>
+                        </linearGradient>
+                        <linearGradient id="boxGrad4" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#a855f7" stop-opacity="0.15"/>
+                            <stop offset="100%" stop-color="#a855f7" stop-opacity="0.05"/>
+                        </linearGradient>
+                        <marker id="arrowHead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                            <path d="M0,0 L8,3 L0,6 Z" fill="#52525b"/>
+                        </marker>
+                    </defs>
+
+                    <rect x="20" y="30" width="180" height="110" rx="12" fill="url(#boxGrad1)" stroke="#3b82f6" stroke-width="1.5"/>
+                    <text x="110" y="65" text-anchor="middle" class="svg-title" font-family="Inter, sans-serif" font-size="14" font-weight="600">Working Directory</text>
+                    <text x="110" y="88" text-anchor="middle" class="svg-muted" font-family="JetBrains Mono, monospace" font-size="10">Your files on disk</text>
+                    <text x="110" y="108" text-anchor="middle" class="svg-muted" font-family="JetBrains Mono, monospace" font-size="9">untracked + modified</text>
+
+                    <rect x="260" y="30" width="180" height="110" rx="12" fill="url(#boxGrad2)" stroke="#eab308" stroke-width="1.5"/>
+                    <text x="350" y="65" text-anchor="middle" class="svg-title" font-family="Inter, sans-serif" font-size="14" font-weight="600">Staging Area</text>
+                    <text x="350" y="88" text-anchor="middle" class="svg-muted" font-family="JetBrains Mono, monospace" font-size="10">Index / Cache</text>
+                    <text x="350" y="108" text-anchor="middle" class="svg-muted" font-family="JetBrains Mono, monospace" font-size="9">staged changes</text>
+
+                    <rect x="500" y="30" width="180" height="110" rx="12" fill="url(#boxGrad3)" stroke="#22c55e" stroke-width="1.5"/>
+                    <text x="590" y="65" text-anchor="middle" class="svg-title" font-family="Inter, sans-serif" font-size="14" font-weight="600">Local Repository</text>
+                    <text x="590" y="88" text-anchor="middle" class="svg-muted" font-family="JetBrains Mono, monospace" font-size="10">.git directory</text>
+                    <text x="590" y="108" text-anchor="middle" class="svg-muted" font-family="JetBrains Mono, monospace" font-size="9">commits + branches</text>
+
+                    <rect x="740" y="30" width="140" height="110" rx="12" fill="url(#boxGrad4)" stroke="#a855f7" stroke-width="1.5"/>
+                    <text x="810" y="65" text-anchor="middle" class="svg-title" font-family="Inter, sans-serif" font-size="14" font-weight="600">Remote</text>
+                    <text x="810" y="88" text-anchor="middle" class="svg-muted" font-family="JetBrains Mono, monospace" font-size="10">GitHub / GitLab</text>
+                    <text x="810" y="108" text-anchor="middle" class="svg-muted" font-family="JetBrains Mono, monospace" font-size="9">shared history</text>
+
+                    <line x1="200" y1="85" x2="258" y2="85" stroke="#52525b" stroke-width="1.5" marker-end="url(#arrowHead)"/>
+                    <g class="svg-cmd-group" @mouseenter="hoveredCmd = 'add'" @mouseleave="hoveredCmd = null">
+                        <rect class="svg-pill svg-pill-stroke" x="205" y="62" width="50" height="24" rx="6" stroke-width="1"/>
+                        <text x="230" y="78" text-anchor="middle" fill="#22c55e" font-family="JetBrains Mono, monospace" font-size="10" font-weight="500">add</text>
+                    </g>
+
+                    <line x1="258" y1="115" x2="200" y2="115" stroke="#52525b" stroke-width="1.5" marker-end="url(#arrowHead)"/>
+                    <g class="svg-cmd-group" @mouseenter="hoveredCmd = 'restore'" @mouseleave="hoveredCmd = null">
+                        <rect class="svg-pill svg-pill-stroke" x="205" y="103" width="50" height="24" rx="6" stroke-width="1"/>
+                        <text x="230" y="119" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono, monospace" font-size="10" font-weight="500">restore</text>
+                    </g>
+
+                    <line x1="440" y1="85" x2="498" y2="85" stroke="#52525b" stroke-width="1.5" marker-end="url(#arrowHead)"/>
+                    <g class="svg-cmd-group" @mouseenter="hoveredCmd = 'commit'" @mouseleave="hoveredCmd = null">
+                        <rect class="svg-pill svg-pill-stroke" x="445" y="62" width="50" height="24" rx="6" stroke-width="1"/>
+                        <text x="470" y="78" text-anchor="middle" fill="#22c55e" font-family="JetBrains Mono, monospace" font-size="10" font-weight="500">commit</text>
+                    </g>
+
+                    <line x1="498" y1="115" x2="440" y2="115" stroke="#52525b" stroke-width="1.5" marker-end="url(#arrowHead)"/>
+                    <g class="svg-cmd-group" @mouseenter="hoveredCmd = 'reset'" @mouseleave="hoveredCmd = null">
+                        <rect class="svg-pill svg-pill-stroke" x="445" y="103" width="50" height="24" rx="6" stroke-width="1"/>
+                        <text x="470" y="119" text-anchor="middle" fill="#ef4444" font-family="JetBrains Mono, monospace" font-size="10" font-weight="500">reset</text>
+                    </g>
+
+                    <line x1="680" y1="85" x2="738" y2="85" stroke="#52525b" stroke-width="1.5" marker-end="url(#arrowHead)"/>
+                    <g class="svg-cmd-group" @mouseenter="hoveredCmd = 'push'" @mouseleave="hoveredCmd = null">
+                        <rect class="svg-pill svg-pill-stroke" x="685" y="62" width="50" height="24" rx="6" stroke-width="1"/>
+                        <text x="710" y="78" text-anchor="middle" fill="#22c55e" font-family="JetBrains Mono, monospace" font-size="10" font-weight="500">push</text>
+                    </g>
+
+                    <line x1="738" y1="115" x2="680" y2="115" stroke="#52525b" stroke-width="1.5" marker-end="url(#arrowHead)"/>
+                    <g class="svg-cmd-group" @mouseenter="hoveredCmd = 'pull'" @mouseleave="hoveredCmd = null">
+                        <rect class="svg-pill svg-pill-stroke" x="685" y="103" width="50" height="24" rx="6" stroke-width="1"/>
+                        <text x="710" y="119" text-anchor="middle" fill="#3b82f6" font-family="JetBrains Mono, monospace" font-size="9" font-weight="500">pull</text>
+                    </g>
+                </svg>
+
+                <div class="absolute bottom-1 left-0 right-0 flex justify-center pointer-events-none">
+                    <div class="rounded-full border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-1.5 text-xs font-mono transition-all duration-150 shadow-sm"
+                         :class="hoveredCmd ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'">
+                        <span x-show="hoveredCmd === 'add'" x-cloak><span class="text-green-600 dark:text-green-500">git add</span> <span class="text-zinc-400">→</span> <span class="text-zinc-500 dark:text-zinc-400">Working directory → staging</span></span>
+                        <span x-show="hoveredCmd === 'restore'" x-cloak><span class="text-red-500 dark:text-red-400">git restore</span> <span class="text-zinc-400">→</span> <span class="text-zinc-500 dark:text-zinc-400">Discards changes, restores from HEAD</span></span>
+                        <span x-show="hoveredCmd === 'commit'" x-cloak><span class="text-green-600 dark:text-green-500">git commit</span> <span class="text-zinc-400">→</span> <span class="text-zinc-500 dark:text-zinc-400">Staging → permanent snapshot</span></span>
+                        <span x-show="hoveredCmd === 'reset'" x-cloak><span class="text-red-500 dark:text-red-400">git reset</span> <span class="text-zinc-400">→</span> <span class="text-zinc-500 dark:text-zinc-400">Unstages or moves HEAD back</span></span>
+                        <span x-show="hoveredCmd === 'push'" x-cloak><span class="text-green-600 dark:text-green-500">git push</span> <span class="text-zinc-400">→</span> <span class="text-zinc-500 dark:text-zinc-400">Local → remote repository</span></span>
+                        <span x-show="hoveredCmd === 'pull'" x-cloak><span class="text-blue-600 dark:text-blue-400">git pull</span> <span class="text-zinc-400">→</span> <span class="text-zinc-500 dark:text-zinc-400">Remote → local, merges changes</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Version -->
+            <div class="sm:hidden space-y-3">
+                <div class="rounded-xl border border-blue-500/30 bg-blue-500/5 p-3 text-center">
+                    <div class="text-sm font-semibold text-blue-400">Working Directory</div>
+                    <div class="text-xs text-zinc-500 mt-0.5">Your files on disk</div>
+                </div>
+                <div class="flex items-center justify-center gap-2 text-xs">
+                    <span class="text-green-500 font-mono">git add ↓</span>
+                    <span class="text-zinc-600">|</span>
+                    <span class="text-red-400 font-mono">git restore ↑</span>
+                </div>
+                <div class="rounded-xl border border-yellow-500/30 bg-yellow-500/5 p-3 text-center">
+                    <div class="text-sm font-semibold text-yellow-400">Staging Area</div>
+                    <div class="text-xs text-zinc-500 mt-0.5">Index / Cache</div>
+                </div>
+                <div class="flex items-center justify-center gap-2 text-xs">
+                    <span class="text-green-500 font-mono">git commit ↓</span>
+                    <span class="text-zinc-600">|</span>
+                    <span class="text-red-400 font-mono">git reset ↑</span>
+                </div>
+                <div class="rounded-xl border border-green-500/30 bg-green-500/5 p-3 text-center">
+                    <div class="text-sm font-semibold text-green-400">Local Repository</div>
+                    <div class="text-xs text-zinc-500 mt-0.5">.git directory</div>
+                </div>
+                <div class="flex items-center justify-center gap-2 text-xs">
+                    <span class="text-green-500 font-mono">git push ↓</span>
+                    <span class="text-zinc-600">|</span>
+                    <span class="text-blue-400 font-mono">git pull ↑</span>
+                </div>
+                <div class="rounded-xl border border-purple-500/30 bg-purple-500/5 p-3 text-center">
+                    <div class="text-sm font-semibold text-purple-400">Remote Repository</div>
+                    <div class="text-xs text-zinc-500 mt-0.5">GitHub / GitLab</div>
+                </div>
+            </div>
+            </div>
+        </section>
 
         <!-- DONATE SECTION -->
         <section id="donate" class="mt-16 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-8 sm:p-12 text-center relative overflow-hidden">
