@@ -145,6 +145,85 @@ def build_pdf(commands, output_path):
     story.append(make_center_table(Paragraph("https://inayatullahshinwari.github.io/git-cheatsheet", cover_link), w=content_w))
     story.append(PageBreak())
 
+    # GIT ARCHITECTURE DIAGRAM
+    story.append(Spacer(1, 20*mm))
+    story.append(make_center_table(Paragraph("Git Architecture", ParagraphStyle("archTitle", fontName="Helvetica-Bold", fontSize=20, textColor=FG, leading=26, spaceAfter=6, alignment=TA_CENTER)), w=content_w))
+    story.append(Spacer(1, 4*mm))
+    story.append(make_center_table(Paragraph("How commands move your code", ParagraphStyle("archSub", fontName="Helvetica", fontSize=10, textColor=MUTED, leading=14, alignment=TA_CENTER)), w=content_w))
+    story.append(Spacer(1, 12*mm))
+
+    # Architecture boxes
+    arch_box = ParagraphStyle("archBox", fontName="Helvetica-Bold", fontSize=10, textColor=FG_SOFT, leading=12, alignment=TA_CENTER)
+    arch_desc = ParagraphStyle("archDesc", fontName="Helvetica", fontSize=8, textColor=MUTED, leading=10, alignment=TA_CENTER)
+    arch_arrow = ParagraphStyle("archArrow", fontName="Courier", fontSize=8, textColor=ACCENT, leading=10, alignment=TA_CENTER)
+    arch_arrow_rev = ParagraphStyle("archArrowRev", fontName="Courier", fontSize=8, textColor=HexColor("#ef4444"), leading=10, alignment=TA_CENTER)
+
+    # Row 1: Boxes
+    box_w = content_w / 4
+    boxes = [
+        ("Working Directory", "Your files on disk", "untracked + modified", HexColor("#1e3a5f"), HexColor("#3b82f6")),
+        ("Staging Area", "Index / Cache", "staged changes", HexColor("#4a4010"), HexColor("#eab308")),
+        ("Local Repository", ".git directory", "commits + branches", HexColor("#14402a"), HexColor("#22c55e")),
+        ("Remote", "GitHub / GitLab", "shared history", HexColor("#3b1f5e"), HexColor("#a855f7")),
+    ]
+
+    box_data = []
+    for title, desc, sub, bg, border in boxes:
+        cell = [
+            Paragraph(title, arch_box),
+            Paragraph(desc, arch_desc),
+            Paragraph(sub, arch_desc),
+        ]
+        box_data.append(cell)
+
+    boxes_table = Table([box_data], colWidths=[box_w]*4)
+    boxes_table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (0, 0), bg),
+        ("BACKGROUND", (1, 0), (1, 0), boxes[1][3]),
+        ("BACKGROUND", (2, 0), (2, 0), boxes[2][3]),
+        ("BACKGROUND", (3, 0), (3, 0), boxes[3][3]),
+        ("BOX", (0, 0), (0, 0), 1.5, boxes[0][4]),
+        ("BOX", (1, 0), (1, 0), 1.5, boxes[1][4]),
+        ("BOX", (2, 0), (2, 0), 1.5, boxes[2][4]),
+        ("BOX", (3, 0), (3, 0), 1.5, boxes[3][4]),
+        ("TOPPADDING", (0, 0), (-1, -1), 8*mm),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 8*mm),
+        ("LEFTPADDING", (0, 0), (-1, -1), 4*mm),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 4*mm),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+    ]))
+    story.append(make_center_table(boxes_table, w=content_w))
+    story.append(Spacer(1, 6*mm))
+
+    # Row 2: Arrows
+    arrows = [
+        ("git add →", "git restore ←"),
+        ("git commit →", "git reset ←"),
+        ("git push →", "git pull ←"),
+        ("", ""),
+    ]
+
+    arrow_data = [[Paragraph(arrows[0][0], arch_arrow), Paragraph(arrows[0][1], arch_arrow_rev), Paragraph("", arch_arrow), Paragraph("", arch_arrow_rev)]]
+    arrows_table = Table(arrow_data, colWidths=[box_w]*4)
+    arrows_table.setStyle(TableStyle([
+        ("TOPPADDING", (0, 0), (-1, -1), 4*mm),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4*mm),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+    ]))
+    story.append(make_center_table(arrows_table, w=content_w))
+    story.append(Spacer(1, 6*mm))
+
+    # Second row of arrows
+    arrows2_data = [[Paragraph(arrows[1][0], arch_arrow), Paragraph(arrows[1][1], arch_arrow_rev), Paragraph(arrows[2][0], arch_arrow), Paragraph(arrows[2][1], arch_arrow_rev)]]
+    arrows2_table = Table(arrows2_data, colWidths=[box_w]*4)
+    arrows2_table.setStyle(TableStyle([
+        ("TOPPADDING", (0, 0), (-1, -1), 4*mm),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4*mm),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+    ]))
+    story.append(make_center_table(arrows2_table, w=content_w))
+    story.append(PageBreak())
+
     # COMMANDS
     categories = {}
     for cmd in commands:
