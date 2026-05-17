@@ -222,7 +222,7 @@ def build_pdf(commands, output_path):
 
 if __name__ == "__main__":
     html_path = os.path.join(os.path.dirname(__file__), "index.html")
-    output_path = os.path.join(os.path.dirname(__file__), "git-cheatsheet.pdf")
+    output_path = os.path.join(os.path.dirname(__file__), "assets", "git-cheatsheet.pdf")
     commands = extract_commands(html_path)
     print(f"Extracted {len(commands)} commands")
     build_pdf(commands, output_path)
