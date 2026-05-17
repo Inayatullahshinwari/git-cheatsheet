@@ -63,6 +63,9 @@ def bg_callback(canvas, doc):
     canvas.saveState()
     canvas.setFillColor(BG)
     canvas.rect(0, 0, doc.pagesize[0], doc.pagesize[1], fill=1, stroke=0)
+    canvas.setFont("Courier", 6.5)
+    canvas.setFillColor(DIM)
+    canvas.drawRightString(doc.pagesize[0] - 15*mm, 8*mm, "@Inayatullahshinwari")
     canvas.restoreState()
 
 def make_center_table(paragraph, bg=BG, padding=0, w=None):
@@ -114,10 +117,18 @@ def build_pdf(commands, output_path):
 
     support_title = ParagraphStyle("SupportTitle", fontName="Helvetica-Bold", fontSize=24, textColor=FG, leading=30, spaceAfter=8)
     support_sub = ParagraphStyle("SupportSub", fontName="Helvetica", fontSize=11, textColor=MUTED, leading=16, spaceAfter=4)
-    support_label = ParagraphStyle("SupportLabel", fontName="Helvetica-Bold", fontSize=9, textColor=FG_SOFT, leading=12, alignment=TA_CENTER)
-    support_link = ParagraphStyle("SupportLink", fontName="Courier", fontSize=10, textColor=ORANGE, leading=14, spaceAfter=4)
     support_foot = ParagraphStyle("SupportFoot", fontName="Helvetica", fontSize=8, textColor=DIM, leading=12, alignment=TA_CENTER)
     support_foot2 = ParagraphStyle("SupportFoot2", fontName="Courier", fontSize=8, textColor=DIM, leading=12, alignment=TA_CENTER)
+
+    div_data = [[Paragraph("", ParagraphStyle("div", fontSize=1, leading=1))]]
+    div_table = Table(div_data, colWidths=[content_w * 0.5])
+    div_table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), HexColor("#2a2a2a")),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+        ("HEIGHT", (0, 0), (-1, -1), 0.5*mm),
+    ]))
 
     # COVER
     story.append(Spacer(1, 55*mm))
@@ -175,65 +186,32 @@ def build_pdf(commands, output_path):
 
     # SUPPORT PAGE
     story.append(PageBreak())
-    story.append(Spacer(1, 35*mm))
+    story.append(Spacer(1, 50*mm))
     story.append(make_center_table(Paragraph("Support This Project", support_title), padding=8*mm, w=content_w))
     story.append(Spacer(1, 6*mm))
     story.append(make_center_table(Paragraph("This cheatsheet is free and always will be.", support_sub), w=content_w))
-    story.append(Spacer(1, 2*mm))
-    story.append(make_center_table(Paragraph("If it saved you time, consider supporting.", support_sub), w=content_w))
-    story.append(Spacer(1, 16*mm))
+    story.append(Spacer(1, 20*mm))
 
-    # Divider line
-    div_data = [[Paragraph("", ParagraphStyle("div", fontSize=1, leading=1))]]
-    div_table = Table(div_data, colWidths=[content_w * 0.6])
-    div_table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, -1), HexColor("#2a2a2a")),
-        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-        ("TOPPADDING", (0, 0), (-1, -1), 0),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
-        ("HEIGHT", (0, 0), (-1, -1), 1*mm),
-    ]))
-    story.append(make_center_table(div_table, w=content_w))
-    story.append(Spacer(1, 16*mm))
-
-    # Support cards
-    card_bg = HexColor("#111111")
-    card_border = HexColor("#2a2a2a")
-    card_label = ParagraphStyle("cardLbl", fontName="Helvetica-Bold", fontSize=10, textColor=FG_SOFT, leading=14, alignment=TA_CENTER)
-    card_value = ParagraphStyle("cardVal", fontName="Courier", fontSize=9, textColor=ORANGE, leading=13, alignment=TA_CENTER)
-    card_desc = ParagraphStyle("cardDesc", fontName="Helvetica", fontSize=8, textColor=MUTED, leading=11, alignment=TA_CENTER)
+    support_item_label = ParagraphStyle("siLbl", fontName="Helvetica-Bold", fontSize=10, textColor=FG_SOFT, leading=14, alignment=TA_CENTER)
+    support_item_value = ParagraphStyle("siVal", fontName="Courier", fontSize=9, textColor=ORANGE, leading=13, alignment=TA_CENTER)
+    support_item_desc = ParagraphStyle("siDesc", fontName="Helvetica", fontSize=8, textColor=MUTED, leading=11, alignment=TA_CENTER)
 
     for label, value, desc in [
         ("Liberapay", "https://liberapay.com/inayatullahshinwari/donate", "Recurring donations, open-source friendly"),
         ("Ko-fi", "https://ko-fi.com/inayatullahshinwari", "One-time tips, quick and easy"),
         ("Crypto (USDT TRC20)", "TUFAAC9Zau3waUuHMnrPoaK92JbXp4YMag", "Direct wallet transfer, no fees"),
     ]:
-        card_content = [
-            [Paragraph(label, card_label)],
-            [Paragraph(value, card_value)],
-            [Paragraph(desc, card_desc)],
-        ]
-        card = Table(card_content, colWidths=[content_w * 0.7])
-        card.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), card_bg),
-            ("BOX", (0, 0), (-1, -1), 1, card_border),
-            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-            ("TOPPADDING", (0, 0), (-1, -1), 8*mm),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 8*mm),
-            ("LEFTPADDING", (0, 0), (-1, -1), 10*mm),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 10*mm),
-            ("ROUNDEDCORNERS", [4, 4, 4, 4]),
-        ]))
-        story.append(make_center_table(card, w=content_w))
-        story.append(Spacer(1, 5*mm))
+        story.append(make_center_table(Paragraph(label, support_item_label), w=content_w))
+        story.append(Spacer(1, 2*mm))
+        story.append(make_center_table(Paragraph(value, support_item_value), w=content_w))
+        story.append(Spacer(1, 1*mm))
+        story.append(make_center_table(Paragraph(desc, support_item_desc), w=content_w))
+        story.append(Spacer(1, 10*mm))
 
-    story.append(Spacer(1, 14*mm))
-    story.append(make_center_table(Paragraph("Thank you for keeping this project alive.", ParagraphStyle("thanks", fontName="Helvetica-Oblique", fontSize=9, textColor=DIM, leading=13, alignment=TA_CENTER)), w=content_w))
-    story.append(Spacer(1, 6*mm))
-
-    # Footer divider
+    story.append(Spacer(1, 10*mm))
     story.append(make_center_table(div_table, w=content_w))
+    story.append(Spacer(1, 8*mm))
+    story.append(make_center_table(Paragraph("Thank you for keeping this project alive.", ParagraphStyle("thanks", fontName="Helvetica-Oblique", fontSize=9, textColor=DIM, leading=13, alignment=TA_CENTER)), w=content_w))
     story.append(Spacer(1, 6*mm))
     story.append(make_center_table(Paragraph("Built with ❤ by Inayatullah Shinwari", support_foot), w=content_w))
     story.append(Spacer(1, 3*mm))
