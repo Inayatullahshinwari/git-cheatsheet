@@ -125,13 +125,71 @@ def build_pdf(commands, output_path):
         alignment=TA_CENTER,
     ))
     
-    # Cover page
-    story.append(Spacer(1, 100*mm))
-    story.append(Paragraph("Git Cheatsheet", styles["PdfTitle"]))
-    story.append(Paragraph("The Ultimate Reference — 70+ Essential Commands", styles["PdfSubtitle"]))
-    story.append(Spacer(1, 20*mm))
-    story.append(Paragraph("By Inayatullah Shinwari", styles["PdfSubtitle"]))
-    story.append(Paragraph("https://inayatullahshinwari.github.io/git-cheatsheet", styles["PdfSubtitle"]))
+    # Cover page - dark background
+    from reportlab.platypus import Frame, PageTemplate, BaseDocTemplate
+    from reportlab.lib.colors import Color
+    
+    # Create cover page with dark background
+    cover_style = ParagraphStyle(
+        "CoverTitle", fontName="Helvetica-Bold", fontSize=32, textColor=FG,
+        leading=38, spaceAfter=6,
+    )
+    cover_sub = ParagraphStyle(
+        "CoverSub", fontName="Helvetica", fontSize=12, textColor=MUTED,
+        leading=18, spaceAfter=6,
+    )
+    cover_ver = ParagraphStyle(
+        "CoverVer", fontName="Courier", fontSize=10, textColor=ACCENT,
+        leading=14, spaceAfter=20,
+    )
+    
+    # Build cover as a table with dark background
+    cover_data = [[Paragraph("Git Cheatsheet", cover_style)]]
+    cover_table = Table(cover_data, colWidths=[width])
+    cover_table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), BG),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("TOPPADDING", (0, 0), (-1, -1), 80*mm),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 80*mm),
+    ]))
+    story.append(cover_table)
+    story.append(Spacer(1, 10*mm))
+    
+    sub_data = [[Paragraph("The Ultimate Reference — 80+ Essential Commands", cover_sub)]]
+    sub_table = Table(sub_data, colWidths=[width])
+    sub_table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), BG),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+    ]))
+    story.append(sub_table)
+    story.append(Spacer(1, 6*mm))
+    
+    ver_data = [[Paragraph("Commands for Git v2.54.0", cover_ver)]]
+    ver_table = Table(ver_data, colWidths=[width])
+    ver_table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), BG),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+    ]))
+    story.append(ver_table)
+    story.append(Spacer(1, 30*mm))
+    
+    author_data = [[Paragraph("By Inayatullah Shinwari", cover_sub)]]
+    author_table = Table(author_data, colWidths=[width])
+    author_table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), BG),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+    ]))
+    story.append(author_table)
+    story.append(Spacer(1, 4*mm))
+    
+    link_data = [[Paragraph("https://inayatullahshinwari.github.io/git-cheatsheet", cover_sub)]]
+    link_table = Table(link_data, colWidths=[width])
+    link_table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), BG),
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+    ]))
+    story.append(link_table)
     story.append(PageBreak())
     
     # Group commands by category

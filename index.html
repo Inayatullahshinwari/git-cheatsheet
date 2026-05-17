@@ -41,7 +41,10 @@
                     <div class="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white text-lg shadow-lg shadow-orange-500/20 group-hover:shadow-orange-500/40 transition-shadow">
                         📋
                     </div>
-                    <span class="text-xl font-bold tracking-tight hidden sm:block">Git<span class="text-orange-500">Cheatsheet</span></span>
+                    <div class="hidden sm:block">
+                        <span class="text-xl font-bold tracking-tight">Git<span class="text-orange-500">Cheatsheet</span></span>
+                        <span class="ml-2 rounded-full bg-orange-100 dark:bg-orange-900/30 px-2 py-0.5 text-[10px] font-bold text-orange-600 dark:text-orange-400">v2.54.0</span>
+                    </div>
                 </a>
                 <div class="flex items-center gap-2">
                     <a href="git-cheatsheet.pdf" download class="flex items-center gap-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 px-3 py-2 text-sm font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-900 dark:hover:bg-zinc-100 hover:text-white dark:hover:text-zinc-900 hover:border-zinc-900 dark:hover:border-zinc-100 transition-all">
@@ -156,7 +159,10 @@
         <!-- DONATE SECTION -->
         <section id="donate" class="mt-16 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-8 sm:p-12 text-center relative overflow-hidden">
             <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-orange-500 via-amber-500 via-green-500 via-blue-500 to-purple-500"></div>
-            <div class="text-5xl mb-4">☕</div>
+            <div class="flex items-center justify-center gap-2 mb-4">
+                <span class="text-5xl">☕</span>
+                <span class="rounded-full bg-zinc-100 dark:bg-zinc-800 px-3 py-1 text-xs font-mono text-zinc-500">Commands for Git v2.54.0</span>
+            </div>
             <h2 class="text-2xl font-bold tracking-tight mb-2">Enjoying this cheatsheet?</h2>
             <p class="text-zinc-500 dark:text-zinc-400 max-w-md mx-auto mb-8 leading-relaxed">
                 This tool is free and always will be. If it saved you time, consider buying me a coffee. Your support keeps me building more tools like this.
@@ -290,6 +296,8 @@
                     { cat: 'advanced', title: 'Show Reflog', code: 'git reflog', desc: 'Show a log of all HEAD movements — recover lost commits.', tags: ['recover', 'history'] },
                     { cat: 'advanced', title: 'Clean Untracked Files', code: 'git clean -fd', desc: 'Remove untracked files and directories (dry-run with -n first!).', tags: ['clean', 'remove'] },
                     { cat: 'advanced', title: 'Bisect for Bugs', code: 'git bisect start\ngit bisect bad\ngit bisect good <commit>', desc: 'Binary search through commit history to find the bug-introducing commit.', tags: ['debug', 'search'] },
+                    { cat: 'advanced', title: 'Reword Commit (Git 2.54+)', code: 'git history reword <commit>', desc: 'Rewrite a commit message in place without touching working tree or index. Simpler than rebase -i.', tags: ['history', 'edit', 'experimental'] },
+                    { cat: 'advanced', title: 'Split Commit (Git 2.54+)', code: 'git history split <commit>', desc: 'Interactively split a commit into two by selecting which hunks go to each.', tags: ['history', 'split', 'experimental'] },
 
                     // CONFIG
                     { cat: 'config', title: 'Set User Name', code: 'git config --global user.name "Your Name"', desc: 'Set the global author name for all commits.', tags: ['setup', 'identity'] },
