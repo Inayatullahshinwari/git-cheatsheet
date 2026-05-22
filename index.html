@@ -27,6 +27,12 @@
     <meta name="twitter:creator" content="@IUShinwari">
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" id="theme-color" content="#09090b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="GitSheet">
+    <link rel="apple-touch-icon" href="assets/icon-192.svg">
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -575,6 +581,7 @@
                     this.dark = !this.dark;
                     document.documentElement.classList.toggle('dark', this.dark);
                     localStorage.setItem('git-cheatsheet-theme', this.dark ? 'dark' : 'light');
+                    document.querySelector('#theme-color').content = this.dark ? '#09090b' : '#f4f4f5';
                 },
 
                 init() {
@@ -583,8 +590,14 @@
                         this.dark = false;
                         document.documentElement.classList.remove('dark');
                     }
+                    document.querySelector('#theme-color').content = this.dark ? '#09090b' : '#f4f4f5';
                 }
             }
+        }
+
+        // Service Worker registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js');
         }
 
         // Keyboard shortcut
