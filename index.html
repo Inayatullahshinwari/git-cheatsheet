@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -413,7 +413,7 @@
     <script>
         function cheatsheet() {
             return {
-                dark: true,
+                dark: false,
                 query: '',
                 activeCat: 'all',
                 toast: { show: false, message: '' },
@@ -586,9 +586,9 @@
 
                 init() {
                     const saved = localStorage.getItem('git-cheatsheet-theme');
-                    if (saved === 'light') {
-                        this.dark = false;
-                        document.documentElement.classList.remove('dark');
+                    if (saved === 'dark') {
+                        this.dark = true;
+                        document.documentElement.classList.add('dark');
                     }
                     document.querySelector('#theme-color').content = this.dark ? '#09090b' : '#f4f4f5';
                 }
